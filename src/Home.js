@@ -15,21 +15,15 @@ const Home = () => {
 
   // Async IIFE for useEffect
   useEffect(() => {
-    // For viewing loading message
+    // Timeout for viewing loading message longer
     setTimeout(() => {
-      (async function fetchBlogs() {
+      (async () => {
         let response = await fetch('http://localhost:8000/blogs');
         response = await response.json();
         setBlogs(response);
         setIsPending(false);
       })();
     }, 1000);
-    // (async function fetchBlogs() {
-    //   let response = await fetch('http://localhost:8000/blogs');
-    //   response = await response.json();
-    //   setBlogs(response);
-    //   setIsPending(false);
-    // })();
   }, []);
 
   return (
