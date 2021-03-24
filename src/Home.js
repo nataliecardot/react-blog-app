@@ -4,30 +4,34 @@ import BlogList from './BlogList';
 const Home = () => {
   const [blogs, setBlogs] = useState(null);
   const [isPending, setIsPending] = useState(true);
-
-  // useEffect(async () => ...) is not allowed (because an async function returns a promise, whereas useEffect should return nothing or a cleanup function), though you can use an async function inside an effect https://www.robinwieruch.de/react-hooks-fetch-data
-  // useEffect(() => {
-  //   fetch('http://localhost:8000/blogs')
-  //     // res.json() parses JSON response into JavaScript object
-  //     .then((res) => res.json())
-  //     .then((data) => setBlogs(data));
-  // }, []);
+  const [error, setError] = useState(null);
 
   // Async IIFE for useEffect
   useEffect(() => {
     // Timeout for viewing loading message longer
     setTimeout(() => {
       (async () => {
-        let response = await fetch('http://localhost:8000/blogs');
-        response = await response.json();
-        setBlogs(response);
-        setIsPending(false);
+        try {
+          let response = await fetch('http://localhost:8000/blogs');
+          if (!response.ok) {
+            // Will be catched below with the message attached to it
+            throw Error('Could not fetch data for that resource');
+          }
+          response = await response.json();
+          setBlogs(response);
+          setIsPending(false);
+          setError(null);
+        } catch (err) {
+          setIsPending(false);
+          setError(err.message);
+        }
       })();
     }, 1000);
   }, []);
 
   return (
     <div className="home">
+      {error && <div>{error}</div>}
       {isPending && <div>Loading...</div>}
       {blogs && <BlogList blogs={blogs} title="All Posts" />}
     </div>
