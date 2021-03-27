@@ -9,11 +9,14 @@ const useFetch = (url) => {
 
   // Async IIFE for useEffect
   useEffect(() => {
+    // After associating abort controller with a fetch, can use the controller to stop the fetch
+    const abortCont = new AbortController();
+
     // Timeout for viewing loading message longer
     setTimeout(() => {
       (async () => {
         try {
-          let response = await fetch(url);
+          let response = await fetch(url, { signal: abortCont.signal });
           if (!response.ok) {
             // Will be catched below with the message attached to it
             throw Error('Could not fetch data for that resource');
@@ -23,11 +26,19 @@ const useFetch = (url) => {
           setIsPending(false);
           setError(null);
         } catch (err) {
-          setIsPending(false);
-          setError(err.message);
+          // If it's an abort error, don't update the state
+          if (err.name === 'AbortError') {
+            console.log('Fetch aborted');
+          } else {
+            setIsPending(false);
+            setError(err.message);
+          }
         }
       })();
     }, 1000);
+
+    // Cleanup function (fires when component that uses this hook unmounts)
+    return () => abortCont.abort();
   }, [url]);
 
   // Returning object rather than array because with an object, order of these properties doesn't matter when we're destructuring them in the file they're imported in (can just grab isPending only, for example)
