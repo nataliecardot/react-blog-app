@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 
 const Create = () => {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [author, setAuthor] = useState('Jane');
   const [isPending, setIsPending] = useState(false);
+  const history = useHistory();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,6 +21,10 @@ const Create = () => {
       body: JSON.stringify(blog),
     }).then(() => {
       setIsPending(false);
+      // To go back one page. Could use pos. integer to go forward
+      // history.go(-1);
+      // Redirect to home
+      history.push('/');
     });
   };
 
