@@ -81,6 +81,11 @@
   cursor: pointer;
 }
 
+.blog-details button:focus {
+  outline: none;
+  transform: scale(0.95);
+}
+
 /* Add blog post form */
 
 .create {
